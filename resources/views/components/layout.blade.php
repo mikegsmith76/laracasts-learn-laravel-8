@@ -24,20 +24,25 @@
 
             <div class="mt-8 md:mt-0 flex items-center">
                 @auth
-                    <span class="text-xs font-bold uppercase">Welcome, {{ auth()->user()->name }}</span>
+                    <x-dropdown>
+                        <x-slot name="trigger">
+                            <button class="text-xs font-bold uppercase">Welcome, {{ auth()->user()->name }}</button>
+                        </x-slot>
+
+                        @can("admin")
+                            <x-dropdown-item href="/admin/posts" :active="request()->is('/admin/posts')">All Posts</x-dropdown-item>
+                            <x-dropdown-item href="/admin/posts/create" :active="request()->is('/admin/posts/create')">New Post</x-dropdown-item>
+                        @endcan
+                        <x-dropdown-item href="#" x-data="{}" @click.prevent="document.querySelector('#logout-form').submit()">Log Out</x-dropdown-item>
+                    </x-dropdown>
 
                     <form
                         action="/logout"
                         class="text-xs font-semibold text-blue-500 ml-6"
+                        id="logout-form"
                         method="POST"
                     >
                         @csrf
-
-                        <button
-                            type="submit"
-                        >
-                            Logout
-                        </button>
                     </form>
                 @else
                     <a href="/register" class="text-xs font-bold uppercase pr-6">Register</a>
@@ -60,24 +65,40 @@
             <div class="mt-10">
                 <div class="relative inline-block mx-auto lg:bg-gray-200 rounded-full">
 
-                    <form method="POST" action="#" class="lg:flex text-sm">
+                    <form
+                        action="/newsletter"
+                        class="lg:flex text-sm"
+                        method="POST"
+                    >
+                        @csrf
+
                         <div class="lg:py-3 lg:px-5 flex items-center">
                             <label for="email" class="hidden lg:inline-block">
                                 <img src="/images/mailbox-icon.svg" alt="mailbox letter">
                             </label>
 
-                            <input id="email" type="text" placeholder="Your email address"
-                                   class="lg:bg-transparent py-2 lg:py-0 pl-4 focus-within:outline-none">
+                            <input
+                                class="lg:bg-transparent py-2 lg:py-0 pl-4 focus-within:outline-none"
+                                id="email"
+                                name="email"
+                                placeholder="Your email address"
+                                type="text"
+                            >
                         </div>
 
-                        <button type="submit"
-                                class="transition-colors duration-300 bg-blue-500 hover:bg-blue-600 mt-4 lg:mt-0 lg:ml-3 rounded-full text-xs font-semibold text-white uppercase py-3 px-8"
+                        <button
+                            class="transition-colors duration-300 bg-blue-500 hover:bg-blue-600 mt-4 lg:mt-0 lg:ml-3 rounded-full text-xs font-semibold text-white uppercase py-3 px-8"
+                            type="submit"
                         >
                             Subscribe
                         </button>
                     </form>
                 </div>
             </div>
+
+            @error("email")
+                <p class="text-sm text-red-500 mt-5">{{ $message }}</p>
+            @enderror
         </footer>
     </section>
 

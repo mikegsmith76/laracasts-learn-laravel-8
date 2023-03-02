@@ -14,7 +14,7 @@
         <h2 class="ml-4">Want to participate?</h2>
     </header>
 
-    <div class="mt-6">
+    <x-form.field>
         <textarea
             class="text-small w-full focus:ring"
             name="body"
@@ -23,12 +23,10 @@
             rows="5"
         ></textarea>
 
-        @error("body")
-        <p class="text-xs text-red-500">{{ $message }}</p>
-        @enderror
-    </div>
+        <x-form.error name="body" />
+    </x-form.field>
 
     <footer class="flex justify-end mt-6 pt-6 border-t border-gray">
-        <x-submit-button>Post</x-submit-button>
+        <x-form.button>Post</x-form.button>
     </footer>
 </form>

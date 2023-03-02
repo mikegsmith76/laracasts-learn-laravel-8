@@ -17,6 +17,8 @@ class Post extends Model
         "excerpt",
         "slug",
         "title",
+        "thumbnail",
+        "user_id",
     ];
 
     protected $with = [
@@ -59,10 +61,5 @@ class Post extends Model
     public function comments(): HasMany
     {
         return $this->hasMany(Comment::class);
-    }
-
-    public function getRouteKeyName()
-    {
-        return "slug";
     }
 }
