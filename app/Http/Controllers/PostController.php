@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 
+use App\Events\Post\Created as PostCreatedEvent;
+use App\Events\Post\Updated as PostUpdatedEvent;
+
 class PostController extends Controller
 {
     public function index()

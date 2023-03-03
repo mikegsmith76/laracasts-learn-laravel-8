@@ -2,11 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\Post\Created as PostCreatedEvent;
+use App\Events\Post\Deleted as PostDeletedEvent;
+use App\Events\Post\Updated as PostUpdatedEvent;
 use App\Models\Post;
 use Illuminate\Validation\Rule;
 
 class AdminPostController extends Controller
 {
+    protected \Illuminate\Events\Dispatcher $dispatcher;
+
+    public function __construct(\Illuminate\Events\Dispatcher $dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
+    }
+
     public function create()
     {
         return view("admin.posts.create");
@@ -15,6 +25,9 @@ class AdminPostController extends Controller
     public function destroy(Post $post)
     {
         $post->delete();
+
+        $this->dispatcher->dispatch(new PostDeletedEvent($post));
+
         return back()->with("success", "Post deleted!");
     }
 
@@ -45,6 +58,8 @@ class AdminPostController extends Controller
 
         $post->create($validated);
 
+        $this->dispatcher->dispatch(new PostCreatedEvent($post));
+
         return back()->with("success", "Post Created!");
     }
 
@@ -59,6 +74,8 @@ class AdminPostController extends Controller
         }
 
         $post->update($validated);
+
+        $this->dispatcher->dispatch(new PostUpdatedEvent($post));
 
         return back()->with("success", "Post Updated!");
     }
