@@ -12,7 +12,7 @@ class Created
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public function __construct(public Post $post, public Comment $comment)
+    public function __construct(public Comment $comment)
     {
     }
 }

@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Events\Post\Created as PostCreatedEvent;
+use App\Events\Post\Deleted as PostDeletedEvent;
+use App\Events\Post\Updated as PostUpdatedEvent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,6 +22,12 @@ class Post extends Model
         "title",
         "thumbnail",
         "user_id",
+    ];
+
+    protected $dispatchesEvents = [
+        "created" => PostCreatedEvent::class,
+        "deleted" => PostDeletedEvent::class,
+        "updated" => PostUpdatedEvent::class,
     ];
 
     protected $with = [
