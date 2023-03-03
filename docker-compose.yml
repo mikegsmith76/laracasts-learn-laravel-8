@@ -1,0 +1,23 @@
+version: "3"
+services:
+    search:
+        image: getmeili/meilisearch:v1.0
+        environment:
+            - MEILI_ENV=development
+            - MEILI_MASTER_KEY=8as4v3aa4fdsa4dfgs43dfgdv34w4rdfgs4jkwe4lkdagdf34d
+        ports:
+            - "7700:7700"
+        volumes:
+            - ./storage/search:/meli_data
+    storage:
+        hostname: minio
+        image: quay.io/minio/minio
+        ports:
+            - "9000:9000"
+            - "9001:9001"
+        volumes:
+            - ./storage/minio:/data
+        environment:
+            MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+            MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+        command: server /data --console-address :9001
