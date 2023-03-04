@@ -35,16 +35,15 @@ class AdminPostController extends Controller
 
     public function store()
     {
-        $post = new Post();
-
         $validated = request()->validate(
-            $this->validationRulesForPost($post),
+            $this->validationRulesForPost(new Post()),
         );
 
         $validated["thumbnail"] = request()->file("thumbnail")->store("thumbnails");
         $validated["user_id"] = auth()->id();
 
-        $post->create($validated);
+        $post = Post::create($validated);
+        $post->categories()->sync($validated["category_id"]);
 
         return back()->with("success", "Post Created!");
     }
@@ -60,6 +59,7 @@ class AdminPostController extends Controller
         }
 
         $post->update($validated);
+        $post->categories()->sync($validated["category_id"]);
 
         return back()->with("success", "Post Updated!");
     }
@@ -68,7 +68,8 @@ class AdminPostController extends Controller
     {
         return [
             "body" => "required|string",
-            "category_id" => ["required", Rule::exists("categories", "id")],
+            "category_id" => ["required", "array"],
+            "category_id.*" => ["required", "numeric", Rule::exists("categories", "id")],
             "excerpt" => "required|string",
             "slug" => ["required", Rule::unique("posts", "slug")->ignore($post)],
             "title" => "required|string",

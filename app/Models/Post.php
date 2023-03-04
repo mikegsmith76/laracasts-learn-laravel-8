@@ -8,6 +8,7 @@ use App\Events\Post\Updated as PostUpdatedEvent;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Post extends Model
@@ -16,7 +17,6 @@ class Post extends Model
 
     protected $fillable = [
         "body",
-        "category_id",
         "excerpt",
         "slug",
         "title",
@@ -32,7 +32,7 @@ class Post extends Model
 
     protected $with = [
         "author",
-        "category",
+        "categories",
     ];
 
     public function scopeFilter(\Illuminate\Database\Eloquent\Builder $query, array $filters = [])
@@ -44,7 +44,7 @@ class Post extends Model
 
         $query->when($filters["category"] ?? false, function($query, $category) {
             $query
-                ->whereHas("category", fn($query) => $query->where("slug", $category));
+                ->whereHas("categories", fn($query) => $query->where("id", $category));
         });
 
         $query->when($filters["search"] ?? false, function($query, $search) {
@@ -62,9 +62,14 @@ class Post extends Model
         return $this->belongsTo(User::class, "user_id");
     }
 
-    public function category(): BelongsTo
+    public function categories(): BelongsToMany
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsToMany(Category::class);
+    }
+
+    public function categoryIds(): array
+    {
+        return $this->categories()->pluck("id")->toArray();
     }
 
     public function comments(): HasMany

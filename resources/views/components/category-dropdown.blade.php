@@ -22,7 +22,7 @@
 
         <x-dropdown-item
             :active="isset($currentCategory) && $currentCategory->is($category)"
-            href="/?category={{ $category->slug }}&{{ $remainingQueryString }}"
+            href="/?category={{ $category->id }}&{{ $remainingQueryString }}"
         >{{ ucwords($category->name) }}</x-dropdown-item>
     @endforeach
 </x-dropdown>

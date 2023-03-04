@@ -28,9 +28,7 @@
                         Back to Posts
                     </a>
 
-                    <div class="space-x-2">
-                        <x-category-button :category="$post->category" />
-                    </div>
+                    <x-category-list :categories="$post->categories" />
                 </div>
 
                 <h1 class="font-bold text-3xl lg:text-4xl mb-10">

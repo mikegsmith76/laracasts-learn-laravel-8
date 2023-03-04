@@ -11,7 +11,12 @@
             <x-form.field>
                 <x-form.label name="category_id" />
 
-                <select name="category_id" id="category_id">
+                <select
+                    class="w-full"
+                    id="category_id"
+                    name="category_id[]"
+                    multiple
+                >
                     @foreach (\App\Models\Category::all() as $category)
                         <option value="{{ $category->id }}" {{ old("category_id") == $category->id ? "selected" : "" }}>{{ $category->name }}</option>
                     @endforeach
