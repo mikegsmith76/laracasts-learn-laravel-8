@@ -2,16 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Post;
-
-use App\Events\Post\Created as PostCreatedEvent;
-use App\Events\Post\Updated as PostUpdatedEvent;
 
 class PostController extends Controller
 {
     public function index()
     {
         return view('posts.index', [
+            "currentCategory" => request("category", 0) > 0 ? Category::findOrFail(request("category")) : null,
             "posts" => Post::latest()->filter(
                 request(["author", "category", "search"])
             )->paginate(6),

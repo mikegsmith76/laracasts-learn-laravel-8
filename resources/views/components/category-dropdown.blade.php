@@ -1,3 +1,5 @@
+@props(["currentCategory"])
+
 <x-dropdown>
     <x-slot name="trigger">
         <button
@@ -10,7 +12,7 @@
     </x-slot>
 
     <x-dropdown-item
-        :active="request()->routeIs('home')"
+        :active="!isset($currentCategory)"
         href="/"
     >All</x-dropdown-item>
 
