@@ -47,4 +47,8 @@
             </form>
         </div>
     </div>
+
+    @if ($currentCategory && auth()->check())
+        <x-category-header :currentCategory="$currentCategory"/>
+    @endif
 </header>

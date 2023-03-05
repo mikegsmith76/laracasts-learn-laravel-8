@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -48,6 +49,16 @@ class User extends Authenticatable
     public function setPasswordAttribute(string $password)
     {
         $this->attributes["password"] = bcrypt($password);
+    }
+
+    public function isSubscribedTo(Category $category): bool
+    {
+        return $this->subscribedCategories->contains($category);
+    }
+
+    public function subscribedCategories(): BelongsToMany
+    {
+        return $this->belongsToMany(Category::class);
     }
 
     public function posts(): HasMany

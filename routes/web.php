@@ -1,6 +1,7 @@
 <?php
 
 use \App\Http\Controllers\AdminPostController;
+use \App\Http\Controllers\CategorySubscribeController;
 use \App\Http\Controllers\CommentController;
 use \App\Http\Controllers\NewsletterController;
 use \App\Http\Controllers\PostController;
@@ -11,6 +12,15 @@ use Illuminate\Support\Facades\Route;
 Route::post("/newsletter", NewsletterController::class);
 
 Route::get('/', [PostController::class, "index"])->name("home");
+
+Route::delete("/category/{category}/subscribe", [CategorySubscribeController::class, "destroy"])
+    ->name("category.unsubscribe")
+    ->middleware("auth");
+
+Route::post("/category/{category}/subscribe", [CategorySubscribeController::class, "store"])
+    ->name("category.subscribe")
+    ->middleware("auth");
+
 Route::get('/posts/{post:slug}', [PostController::class, "show"])->name("post");
 Route::post('/posts/{post:slug}/comment', [CommentController::class, "store"])->name("comment")->middleware("auth");
 

@@ -7,13 +7,32 @@ use App\Models\Post;
 
 class PostController extends Controller
 {
+    protected \Illuminate\Http\Request $request;
+
+    public function __construct(\Illuminate\Http\Request $request)
+    {
+        $this->request = $request;
+    }
+
     public function index()
     {
+        $currentCategory = Category::find(
+            $this->request->input("category", 0)
+        );
+
+        $postsCollection = Post::latest()
+            ->filter(
+                $this->request->only([
+                    "author",
+                    "category",
+                    "search",
+                ])
+            )
+            ->paginate(6);
+
         return view('posts.index', [
-            "currentCategory" => request("category", 0) > 0 ? Category::findOrFail(request("category")) : null,
-            "posts" => Post::latest()->filter(
-                request(["author", "category", "search"])
-            )->paginate(6),
+            "currentCategory" => $currentCategory,
+            "posts" => $postsCollection,
         ]);
     }
 

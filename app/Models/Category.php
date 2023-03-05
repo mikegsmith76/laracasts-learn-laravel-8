@@ -20,8 +20,8 @@ class Category extends Model
         return $this->belongsToMany(Post::class);
     }
 
-    public function getRouteKeyName()
+    public function subscribers()
     {
-        return "slug";
+        return $this->belongsToMany(User::class);
     }
 }
