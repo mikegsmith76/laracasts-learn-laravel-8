@@ -2,11 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\Post\Created as PostCreatedEvent;
 use App\Models\Post;
 use Illuminate\Validation\Rule;
 
 class AdminPostController extends Controller
 {
+    public function __construct(protected \Illuminate\Events\Dispatcher $dispatcher)
+    {
+    }
+
     public function create()
     {
         return view("admin.posts.create");
@@ -44,6 +49,8 @@ class AdminPostController extends Controller
 
         $post = Post::create($validated);
         $post->categories()->sync($validated["category_id"]);
+
+        $this->dispatcher->dispatch(new PostCreatedEvent($post));
 
         return back()->with("success", "Post Created!");
     }

@@ -21,7 +21,7 @@ Route::post("/category/{category}/subscribe", [CategorySubscribeController::clas
     ->name("category.subscribe")
     ->middleware("auth");
 
-Route::get('/posts/{post:slug}', [PostController::class, "show"])->name("post");
+Route::get('/posts/{post:slug}', [PostController::class, "show"])->name("post.show");
 Route::post('/posts/{post:slug}/comment', [CommentController::class, "store"])->name("comment")->middleware("auth");
 
 Route::get("/register", [RegisterController::class, "create"])->name("register")->middleware("guest");

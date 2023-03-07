@@ -11,9 +11,9 @@ class Comment extends Model
 {
     use HasFactory;
 
-    protected $dispatchesEvents = [
+/*    protected $dispatchesEvents = [
         "created" => CommentCreatedEvent::class,
-    ];
+    ];*/
 
     protected $fillable = [
         "body",

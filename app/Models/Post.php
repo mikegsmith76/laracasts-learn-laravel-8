@@ -5,11 +5,13 @@ namespace App\Models;
 use App\Events\Post\Created as PostCreatedEvent;
 use App\Events\Post\Deleted as PostDeletedEvent;
 use App\Events\Post\Updated as PostUpdatedEvent;
+use App\Pivots\CategoryUser;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Post extends Model
 {
@@ -24,11 +26,11 @@ class Post extends Model
         "user_id",
     ];
 
-    protected $dispatchesEvents = [
+/*    protected $dispatchesEvents = [
         "created" => PostCreatedEvent::class,
         "deleted" => PostDeletedEvent::class,
         "updated" => PostUpdatedEvent::class,
-    ];
+    ];*/
 
     protected $with = [
         "author",
@@ -75,5 +77,15 @@ class Post extends Model
     public function comments(): HasMany
     {
         return $this->hasMany(Comment::class);
+    }
+
+    /**
+     * accessor for calling $post->subscribers
+     **/
+    public function getSubscribersAttribute()
+    {
+        return $this->categories()->with("subscribers")->get()->flatMap(function($category) {
+            return $category->subscribers;
+        })->keyBy("email");
     }
 }
