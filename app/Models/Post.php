@@ -2,20 +2,19 @@
 
 namespace App\Models;
 
-use App\Events\Post\Created as PostCreatedEvent;
-use App\Events\Post\Deleted as PostDeletedEvent;
-use App\Events\Post\Updated as PostUpdatedEvent;
-use App\Pivots\CategoryUser;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Laravel\Scout\Searchable;
 
 class Post extends Model
 {
-    use HasFactory;
+    use
+        HasFactory,
+        Searchable
+    ;
 
     protected $fillable = [
         "body",
@@ -26,38 +25,10 @@ class Post extends Model
         "user_id",
     ];
 
-/*    protected $dispatchesEvents = [
-        "created" => PostCreatedEvent::class,
-        "deleted" => PostDeletedEvent::class,
-        "updated" => PostUpdatedEvent::class,
-    ];*/
-
     protected $with = [
         "author",
         "categories",
     ];
-
-    public function scopeFilter(\Illuminate\Database\Eloquent\Builder $query, array $filters = [])
-    {
-        $query->when($filters["author"] ?? false, function($query, $author) {
-            $query
-                ->whereHas("author", fn($query) => $query->where("username", $author));
-        });
-
-        $query->when($filters["category"] ?? false, function($query, $category) {
-            $query
-                ->whereHas("categories", fn($query) => $query->where("id", $category));
-        });
-
-        $query->when($filters["search"] ?? false, function($query, $search) {
-            $query
-                ->where(function($query) use ($search) {
-                    $query
-                        ->where("title", "like", "%" . $search . "%")
-                        ->orWhere("body", "like", "%" . $search . "%");
-                });
-        });
-    }
 
     public function author(): BelongsTo
     {
@@ -87,5 +58,28 @@ class Post extends Model
         return $this->categories()->with("subscribers")->get()->flatMap(function($category) {
             return $category->subscribers;
         })->keyBy("email");
+    }
+
+    public function searchWithFilters(string $phrase, array $filters): \Laravel\Scout\Builder
+    {
+        $queryBuilder = $this->search($phrase);
+
+        foreach ($filters as $key => $values) {
+            $queryBuilder->whereIn($key, (array) $values);
+        }
+
+        return $queryBuilder;
+    }
+
+    public function toSearchableArray(): array
+    {
+        return [
+            "id" => $this->id,
+            "author" => $this->author->username,
+            "categories" => $this->categories->pluck("name")->toArray(),
+            "excerpt" => $this->excerpt,
+            "slug" => $this->slug,
+            "title" => $this->title,
+        ];
     }
 }

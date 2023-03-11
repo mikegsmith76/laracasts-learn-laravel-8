@@ -8,10 +8,12 @@ use App\Models\Post;
 class PostController extends Controller
 {
     protected \Illuminate\Http\Request $request;
+    protected Post $postRepository;
 
-    public function __construct(\Illuminate\Http\Request $request)
+    public function __construct(\Illuminate\Http\Request $request, Post $postRepository)
     {
         $this->request = $request;
+        $this->postRepository = $postRepository;
     }
 
     public function index()
@@ -20,19 +22,19 @@ class PostController extends Controller
             $this->request->input("category", 0)
         );
 
-        $postsCollection = Post::latest()
-            ->filter(
+        $posts = $this->postRepository
+            ->searchWithFilters(
+                $requestParameters["search"] ?? "*",
                 $this->request->only([
                     "author",
-                    "category",
-                    "search",
+                    "categories",
                 ])
             )
-            ->paginate(6);
+            ->paginate(50);
 
         return view('posts.index', [
             "currentCategory" => $currentCategory,
-            "posts" => $postsCollection,
+            "posts" => $posts,
         ]);
     }
 
